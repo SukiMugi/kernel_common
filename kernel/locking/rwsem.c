@@ -28,11 +28,11 @@
 #include <linux/rwsem.h>
 #include <linux/atomic.h>
 #include <trace/events/lock.h>
+#include <trace/hooks/rwsem.h>
 
 #ifndef CONFIG_PREEMPT_RT
 #include "lock_events.h"
 #include <trace/hooks/dtask.h>
-#include <trace/hooks/rwsem.h>
 
 /*
  * The least significant 2 bits of the owner value has the following
@@ -1508,8 +1508,14 @@ static inline void __downgrade_write(struct rw_semaphore *sem)
 #define rwbase_signal_pending_state(state, current)	\
 	signal_pending_state(state, current)
 
+#define rwbase_pre_schedule()				\
+	rt_mutex_pre_schedule()
+
 #define rwbase_schedule()				\
-	schedule()
+	rt_mutex_schedule()
+
+#define rwbase_post_schedule()				\
+	rt_mutex_post_schedule()
 
 #include "rwbase_rt.c"
 
